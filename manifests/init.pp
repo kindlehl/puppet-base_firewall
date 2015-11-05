@@ -95,12 +95,17 @@ class base_firewall (
   $chain_policy            = 'drop',
   $chain_purge             = false,
   $manage_logging          = false,
+  $dualstack_rules	   = undef
 ) {
 
   #------------------------ Validation ----------------------------------------
 
   validate_bool($allow_new_outgoing_ipv4)
   validate_bool($allow_new_outgoing_ipv6)
+
+  if $rules {
+    validate_hash($rules)
+  }
 
   if !is_integer($sshd_port) or $sshd_port < 1 or $sshd_port > 65535 {
     fail('sshd_port must be an integer between [1, 65535].')
@@ -154,7 +159,8 @@ class base_firewall (
   # rules always run before the post rules to prevent
   # us from being locked out of the system.
   Firewall {
-    require => [Class['base_firewall::pre_ipv4'],
+    require => [Class['firewall'],
+    		Class['base_firewall::pre_ipv4'],
                 Class['base_firewall::pre_ipv6']],
     before  => [Class['base_firewall::post_ipv4'],
                 Class['base_firewall::post_ipv6']],
@@ -174,12 +180,27 @@ class base_firewall (
   $rules = hiera_hash('base_firewall::rules', {})
 
   # Create rules from the given hash.
-  $defaults = {
-  	# firewall class before firewall types
-  	require => Class['firewall']
-  }
+
   if $rules {
-    create_resources(firewall, $rules, $defaults)
+    $rules.each |String $name, Hash $params| { 
+   
+        notice("${name} = ${params}")  	
+        
+        # dublicate rule for ipv6
+        if $params['ipv6'] {
+                $params6 = { provider => ip6tables } + $params
+                notice("${params6}")
+
+                $rules6 = { "$name IP6" => $params6 - ipv6 }
+                notice("${rules6}")
+
+                create_resources(firewall, $rules6)
+        }
+   
+        $rules4 = { $name => $params - ipv6 }
+        notice("${rules4}")
+        create_resources(firewall, $rules4) 
+    }
   }
 
   if $manage_logging {
