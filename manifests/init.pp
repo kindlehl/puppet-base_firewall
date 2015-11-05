@@ -10,6 +10,7 @@
 # firewall { '150 open tcp port 585':
 #   dport => 585,
 #   action => accept,
+#   ipv6 => false
 # }
 #
 # Each rule name must be unique. The rules are added to each individual
@@ -17,6 +18,10 @@
 # should start with a three digit number to assist in ordering. 000-099
 # and 900-999 are reserved for the "pre" and "post" rulesets that are
 # defined by this module.
+#
+# by default all rules are added for ipv4 and ipv6 (for dualstack setup)
+# if you need a rule to be ipv4 only, you can pass ipv6 => false
+# for a ipv6 only rule pass ipv6 => only
 #
 # For additional information see the Puppet Labs firewall module documenation
 # at https://forge.puppetlabs.com/puppetlabs/firewall.
@@ -195,11 +200,12 @@ class base_firewall (
                 notice("${rules6}")
                 create_resources(firewall, $rules6)
         }
-   
-        $rules4 = { $name => $params - ipv6 }
-                
-        notice("${rules4}")
-        create_resources(firewall, $rules4) 
+   	if $params['ipv6'] != "only" {
+            $rules4 = { $name => $params - ipv6 }
+                    
+            notice("${rules4}")
+            create_resources(firewall, $rules4) 
+        }
     }
   }
 

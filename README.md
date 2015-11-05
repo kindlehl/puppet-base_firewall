@@ -50,6 +50,10 @@ Each rule name must be unique. By convention each rule should start with a
 three digit number to assist in ordering. 000-099 and 900-999 should be
 reserved for the base_firewall's rulesets.
 
+by default all rules are added for ipv4 and ipv6 (for dualstack setup).
+if you need a rule to be ipv4 only, you can pass ipv6 => false.
+for a ipv6 only rule pass ipv6 => only.
+
 The default set of INPUT rules created by this module are as follows.
 
 * allow all on loopback
@@ -124,6 +128,7 @@ base_firewall::rules:
     dport:  22
     action: accept
     chain:  OUTPUT
+    ipv6:   false
   '102 allow outgoing dns':
     dport:  53
     proto:  udp
