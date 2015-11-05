@@ -23,6 +23,9 @@ rules from Hiera or by directly using the puppetlabs/firewall types.
 
 ## Setup
 
+This module needs future parser enabled (for hash iteration functions)
+See: https://docs.puppetlabs.com/puppet/3.8/reference/experiments_future.html
+
 ### What base_firewall affects
 
 * IPv4 firewall rules
