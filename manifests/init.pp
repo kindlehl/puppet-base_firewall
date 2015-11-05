@@ -184,12 +184,10 @@ class base_firewall (
   if $rules {
     $rules.each |String $name, Hash $params| { 
    
-        notice("${name} = ${params}")  	
-        
         # dublicate rule for ipv6
-        if $params['ipv6'] {
+        if $params['ipv6'] != false {
                 $params6 = { provider => ip6tables } + $params
-                notice("${params6}")
+                # notice("${params6}")
 
                 $rules6 = { "$name IP6" => $params6 - ipv6 }
                 notice("${rules6}")
