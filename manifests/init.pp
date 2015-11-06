@@ -10,7 +10,6 @@
 # firewall { '150 open tcp port 585':
 #   dport => 585,
 #   action => accept,
-#   ipv6 => false
 # }
 #
 # Each rule name must be unique. The rules are added to each individual
@@ -19,7 +18,7 @@
 # and 900-999 are reserved for the "pre" and "post" rulesets that are
 # defined by this module.
 #
-# by default all rules are added for ipv4 and ipv6 (for dualstack setup)
+# by default all rules coming from hiera are added for ipv4 and ipv6 (for dualstack setup)
 # if you need a rule to be ipv4 only, you can pass ipv6 => false
 # for a ipv6 only rule pass ipv6 => only
 #
